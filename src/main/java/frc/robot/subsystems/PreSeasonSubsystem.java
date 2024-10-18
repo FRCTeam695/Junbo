@@ -21,7 +21,9 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.IntegerPublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 
 import java.lang.Object;
 import com.revrobotics.CANSparkLowLevel;
@@ -29,6 +31,8 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+
 import java.lang.AutoCloseable;
 
 
@@ -37,7 +41,7 @@ public class PreSeasonSubsystem extends SubsystemBase {
 
   private final LEDSubsystem LEDs;
 
-  private int cnt = 0;
+  /*private int cnt = 0;
   private int maxcnt = 50;
   private int x = 0, y = 0;
   private int xinc = 1, yinc = 1;
@@ -49,17 +53,20 @@ public class PreSeasonSubsystem extends SubsystemBase {
   IntegerPublisher yPub;
 
   BooleanPublisher xButton;
-  DoublePublisher xStick;
+  DoublePublisher xStick;*/
 
   CANSparkFlex myMotor;
 
+  // Tank + Arcade
   CANSparkMax frontLeftMotor;
   CANSparkMax frontRightMotor;
   CANSparkMax backLeftMotor;
   CANSparkMax backRightMotor;
-
   RelativeEncoder leftEncoder;
   RelativeEncoder rightEncoder;
+
+  // PID
+  Spark myMotor2;
 
   /** Creates a new ExampleSubsystem. */
   public PreSeasonSubsystem()
@@ -83,8 +90,8 @@ public class PreSeasonSubsystem extends SubsystemBase {
 
     //myMotor = new CANSparkFlex(56, MotorType.kBrushless);
 
-    // Tank drive: Motors
-    frontLeftMotor = new CANSparkMax (10, MotorType.kBrushless);
+    // Tank + Arcade drive: Motors
+    /*frontLeftMotor = new CANSparkMax (10, MotorType.kBrushless);
     frontLeftMotor.restoreFactoryDefaults();
 
     frontRightMotor = new CANSparkMax (11, MotorType.kBrushless);
@@ -107,10 +114,13 @@ public class PreSeasonSubsystem extends SubsystemBase {
     leftEncoder.setPosition(0);
 
     rightEncoder= frontLeftMotor.getEncoder();
-    rightEncoder.setPosition(0);
+    rightEncoder.setPosition(0);*/
+
+    // PID: Motor
+    myMotor2 = new Spark(0);
   }
 
-  // Single motor control
+  // Single motor control: Open-loop
   public void motorSet(double angle) {
     myMotor.set(angle);
     LEDs.motorLED(angle);
@@ -124,6 +134,11 @@ public class PreSeasonSubsystem extends SubsystemBase {
   public void arcadeSet (double Y, double X) {
     frontLeftMotor.set(Y+X);
     frontRightMotor.set(Y-X);
+  }
+
+  // SIngle motor control: Closed-loop
+  public void motorSet2(double angle) {
+    myMotor2.set(angle);
   }
 
 @Override

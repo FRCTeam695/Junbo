@@ -6,7 +6,7 @@ package frc.robot;
 
 //import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.Autos;
-import frc.robot.commands.PreSeasonCommands;
+import frc.robot.subsystems.MotorSubsystem;
 //import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.PreSeasonSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,6 +14,12 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
+
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
+
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 
 //import edu.wpi.first.wpilibj.PWM;
@@ -29,11 +35,13 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final PreSeasonSubsystem mySubsystem = new PreSeasonSubsystem();
-  private final PreSeasonCommands driveTrain = new PreSeasonCommands(mySubsystem); // mySubsystem = PreSeasonSubsystem
+  private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem); // mySubsystem = PreSeasonSubsystem
 
   // Joysticks (Not controller)
   //public static CommandJoystick myLeftJoystick;
   //public static CommandJoystick myRightJoystick;
+
+  // PID controls
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private static final CommandXboxController m_driverController =
@@ -96,15 +104,17 @@ public class RobotContainer {
     // Motor movement
     // mySubsystem.setDefaultCommand(runOnce(() -> mySubsystem.motorSet(m_driverController.getRightY()), mySubsystem));
 
-    mySubsystem.setDefaultCommand(driveTrain);
+      // Calculations
+
+     //driveTrain.setDefaultCommand(runOnce(() -> driveTrain.BasicDrivetrains(), driveTrain));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  //public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return driveTrain;
-  }
+    //return driveTrain;
+  //}
 }
