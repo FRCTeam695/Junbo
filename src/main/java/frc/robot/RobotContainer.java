@@ -10,13 +10,14 @@ import frc.robot.subsystems.MotorSubsystem;
 //import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.PreSeasonSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -35,7 +36,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final PreSeasonSubsystem mySubsystem = new PreSeasonSubsystem();
-  private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem); // mySubsystem = PreSeasonSubsystem
+  private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem, 56, 100, 1, (1.0/565), -1.0, 1.0); // mySubsystem = PreSeasonSubsystem
 
   // Joysticks (Not controller)
   //public static CommandJoystick myLeftJoystick;
@@ -105,8 +106,10 @@ public class RobotContainer {
     // mySubsystem.setDefaultCommand(runOnce(() -> mySubsystem.motorSet(m_driverController.getRightY()), mySubsystem));
 
       // Calculations
-
-     //driveTrain.setDefaultCommand(runOnce(() -> driveTrain.BasicDrivetrains(), driveTrain));
+      System.out.println("binding x");
+      m_driverController.x().onTrue(new PrintCommand("msg1111"));
+    //m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(), driveTrain));
+    //driveTrain.setDefaultCommand(runOnce(() -> driveTrain.PID(), driveTrain));
   }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
