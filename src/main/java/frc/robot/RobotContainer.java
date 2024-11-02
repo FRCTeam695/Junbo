@@ -36,7 +36,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final PreSeasonSubsystem mySubsystem = new PreSeasonSubsystem();
-  private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem, 56, 100, 1, (1.0/565), -1.0, 1.0); // mySubsystem = PreSeasonSubsystem
+  private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem, 56, 10,10, 565, -1.0, 1.0); // mySubsystem = PreSeasonSubsystem
 
   // Joysticks (Not controller)
   //public static CommandJoystick myLeftJoystick;
@@ -48,7 +48,7 @@ public class RobotContainer {
   private static final CommandXboxController m_driverController =
       new CommandXboxController(0);
 
-  public static CommandXboxController getController() {
+  public CommandXboxController getController() {
     return m_driverController;
   }
 
@@ -57,11 +57,10 @@ public class RobotContainer {
     // Joystick buttons (Not controller)
     //myLeftJoystick = new CommandJoystick(0);
     //myRightJoystick = new CommandJoystick(1);
-  
+    
     // Configure the trigger bindings
     configureBindings();
   }
-
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -83,7 +82,35 @@ public class RobotContainer {
     // Example control
     // m_driverController.x().whileTrue(m_exampleSubsystem.servoCommand1());
 
-    // Task 1 - DONE  
+    // Motor movement
+    // mySubsystem.setDefaultCommand(runOnce(() -> mySubsystem.motorSet(m_driverController.getRightY()), mySubsystem));
+
+    // Calculations
+    m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(1), driveTrain));
+    m_driverController.y().onTrue(runOnce(() -> driveTrain.PID(2), driveTrain));
+    m_driverController.a().onTrue(runOnce(() -> driveTrain.PID(3), driveTrain));
+    m_driverController.b().onTrue(runOnce(() -> driveTrain.PID(4), driveTrain));
+    //driveTrain.setDefaultCommand(runOnce(() -> driveTrain.PID(), driveTrain));
+  }
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  //public Command getAutonomousCommand() {
+    // An example command will be run in autonomous
+    //return driveTrain;
+  //}
+}
+
+// Terminal
+// git add .
+// git commit -m 'message'
+// git push
+
+
+// Old code
+ // Task 1 - DONE  
     /*m_driverController.x().onTrue(runOnce(() -> m_exampleSubsystem.task1method("x"), m_exampleSubsystem));
     m_driverController.y().onTrue(runOnce(() -> m_exampleSubsystem.task1method("y"), m_exampleSubsystem));
     m_driverController.a().onTrue(runOnce(() -> m_exampleSubsystem.task1method("a"), m_exampleSubsystem));
@@ -102,22 +129,3 @@ public class RobotContainer {
       */
       //m_exampleSubsystem.setDefaultCommand(runOnce(() -> m_exampleSubsystem.task4method((m_driverController.getRightY() + 1)/2), m_exampleSubsystem));
     
-    // Motor movement
-    // mySubsystem.setDefaultCommand(runOnce(() -> mySubsystem.motorSet(m_driverController.getRightY()), mySubsystem));
-
-      // Calculations
-      System.out.println("binding x");
-      m_driverController.x().onTrue(new PrintCommand("msg1111"));
-    //m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(), driveTrain));
-    //driveTrain.setDefaultCommand(runOnce(() -> driveTrain.PID(), driveTrain));
-  }
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  //public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    //return driveTrain;
-  //}
-}

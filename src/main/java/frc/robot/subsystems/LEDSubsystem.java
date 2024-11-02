@@ -30,6 +30,26 @@ public class LEDSubsystem extends SubsystemBase{
         alphaLED.setData(alphaLEDBuffer);
         alphaLED.start();
     }
-
+    public enum Colors {
+        RED,
+        YELLOW,
+        GREEN,
+        BLUE,
+    }
     
+    public void setColor(String color) {
+        alphaLED.setLength(alphaLEDBuffer.getLength());
+        switch (color) {
+            case "r":
+                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 255, 0, 0);
+            case "g":
+                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 0, 255, 0);
+            case "y":
+                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 255, 255, 0);
+            case "b":
+                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 0, 0, 255);
+        }
+        alphaLED.setData(alphaLEDBuffer);
+        alphaLED.start();
+    }
 }

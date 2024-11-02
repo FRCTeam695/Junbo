@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class MotorSubsystem extends SubsystemBase {
+    //private final LEDSubsystem LEDs = new LEDSubsystem();
+
     private final PreSeasonSubsystem tankDrive;
     private final PreSeasonSubsystem arcadeDrive;
     private final PreSeasonSubsystem swerveDrive;
@@ -34,9 +36,8 @@ public class MotorSubsystem extends SubsystemBase {
     // PID
     private CANSparkFlex myMotor2;
     private RelativeEncoder myEncoder;
-
     private SparkPIDController myPID;
-    private final double setPoint = 1000.0;
+    private double setPoint;
 
 
     public MotorSubsystem(PreSeasonSubsystem driveTrains, int motorNum, 
@@ -57,15 +58,17 @@ public class MotorSubsystem extends SubsystemBase {
         // PID
         myMotor2 = new CANSparkFlex(motorNum, MotorType.kBrushless);
         myEncoder =  myMotor2.getEncoder();
+
+        myMotor2.restoreFactoryDefaults();
+        myEncoder.setPosition(0);
+
         myPID = myMotor2.getPIDController();
-            myPID.setP(1);
-            myPID.setD(0.1);
+            myPID.setP(kP);
+            myPID.setD(kD);
             // Set the minimum and maximum outputs of the motor [-1, 1]
             myPID.setOutputRange(kMinOutput, kMaxOutput);
             // Set kFF
             myPID.setFF(1/Kv);
-
-        System.out.println("???");
     }
 
     public void BasicDrivetrains () {
@@ -75,15 +78,35 @@ public class MotorSubsystem extends SubsystemBase {
         //arcadeDrive.arcadeSet(forwardSpeed * 0.7, turningSpeed * 0.3);
     }
 
-    public void PID () {
-        SmartDashboard.putNumber("Encoder", myEncoder.getPosition());
+    public void PID (int value) {
+        switch (value) {
+            case 1:
+                setPoint = 0;
+                //LEDs.setColor("b");
+                break;
+            case 2:
+                setPoint = 50;
+                //LEDs.setColor("y");
+                break;
+            case 3:
+                setPoint = -100;
+                //LEDs.setColor("r");
+                break;
+            case 4:
+                setPoint = 100;
+                //LEDs.setColor("g");
+                break;
+        }
         myPID.setReference(setPoint, CANSparkFlex.ControlType.kPosition);
-        
+        //robotContainer.getController().b().whileTrue(() -> 
+        //myMotor2.restoreFactoryDefaults(),
+        //myEncoder.setPosition(0));
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("myString", myEncoder.getPosition());
+        SmartDashboard.putNumber("Encoder", myEncoder.getPosition());
+        SmartDashboard.putNumber("Setpoint", setPoint);
     }
 
     public RelativeEncoder getEncoder() {
