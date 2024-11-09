@@ -19,6 +19,7 @@ import static edu.wpi.first.wpilibj2.command.Commands.*;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
@@ -36,7 +37,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final PreSeasonSubsystem mySubsystem = new PreSeasonSubsystem();
-  private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem, 56, 10,10, 565, -1.0, 1.0); // mySubsystem = PreSeasonSubsystem
+  private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem, 56); // mySubsystem = PreSeasonSubsystem
 
   // Joysticks (Not controller)
   //public static CommandJoystick myLeftJoystick;
@@ -86,12 +87,10 @@ public class RobotContainer {
     // mySubsystem.setDefaultCommand(runOnce(() -> mySubsystem.motorSet(m_driverController.getRightY()), mySubsystem));
 
     // Calculations
-    m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(1), driveTrain));
-    m_driverController.y().onTrue(runOnce(() -> driveTrain.PID(2), driveTrain));
-    m_driverController.a().onTrue(runOnce(() -> driveTrain.PID(3), driveTrain));
-    m_driverController.b().onTrue(runOnce(() -> driveTrain.PID(4), driveTrain));
-    //driveTrain.setDefaultCommand(runOnce(() -> driveTrain.PID(), driveTrain));
+    //driveTrain.setDefaultCommand(runOnce(() -> ifButtonPressed(), driveTrain));
+    m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(2), driveTrain));
   }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -129,3 +128,8 @@ public class RobotContainer {
       */
       //m_exampleSubsystem.setDefaultCommand(runOnce(() -> m_exampleSubsystem.task4method((m_driverController.getRightY() + 1)/2), m_exampleSubsystem));
     
+  // PID button control
+  /*m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(1), driveTrain));
+    m_driverController.y().onTrue(runOnce(() -> driveTrain.PID(2), driveTrain));
+    m_driverController.a().onTrue(runOnce(() -> driveTrain.PID(3), driveTrain));
+    m_driverController.b().onTrue(runOnce(() -> driveTrain.PID(4), driveTrain));*/

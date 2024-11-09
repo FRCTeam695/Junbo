@@ -11,8 +11,12 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -37,12 +41,20 @@ public class MotorSubsystem extends SubsystemBase {
     private CANSparkFlex myMotor2;
     private RelativeEncoder myEncoder;
     private SparkPIDController myPID;
-    private double setPoint;
 
+    private static double setpointPosition;
+    private static double setpointVelocity;
+    private static double kP = 10;
+    private static double kD = 10;
 
-    public MotorSubsystem(PreSeasonSubsystem driveTrains, int motorNum, 
-                          double kP, double kD, double Kv, 
-                          double kMinOutput, double kMaxOutput) {
+    private static final double Kv = 565;
+    private static final double kMaxOutput = 1;
+    private static final double kMinOutput = -1;
+
+    //private ShuffleboardTab tab = Shuffleboard.getTab("Encoder");
+    //private GenericEntry encoderTab = tab.add("???", 0).getEntry();
+
+    public MotorSubsystem(PreSeasonSubsystem driveTrains, int motorNum) {
         tankDrive = driveTrains;
         arcadeDrive = driveTrains;
         swerveDrive = driveTrains;
@@ -63,12 +75,15 @@ public class MotorSubsystem extends SubsystemBase {
         myEncoder.setPosition(0);
 
         myPID = myMotor2.getPIDController();
-            myPID.setP(kP);
-            myPID.setD(kD);
-            // Set the minimum and maximum outputs of the motor [-1, 1]
-            myPID.setOutputRange(kMinOutput, kMaxOutput);
-            // Set kFF
-            myPID.setFF(1/Kv);
+            myPID.setP(kP); // Set kP
+            myPID.setD(kD); // Set kD
+            myPID.setOutputRange(kMinOutput, kMaxOutput); // Set the minimum and maximum outputs of the motor [-1, 1]
+            myPID.setFF(0); // Set kFF
+        
+        Preferences.initDouble("Encoder Setpoint Position", 0); // Setpoint Position
+        Preferences.initDouble("Encoder Setpoint Velocity", 0); // Setpoint Velocity
+        Preferences.initDouble("kP Value", 10); // kP
+        Preferences.initDouble("kD Value", 10); // kD
     }
 
     public void BasicDrivetrains () {
@@ -78,26 +93,13 @@ public class MotorSubsystem extends SubsystemBase {
         //arcadeDrive.arcadeSet(forwardSpeed * 0.7, turningSpeed * 0.3);
     }
 
-    public void PID (int value) {
-        switch (value) {
-            case 1:
-                setPoint = 0;
-                //LEDs.setColor("b");
-                break;
-            case 2:
-                setPoint = 50;
-                //LEDs.setColor("y");
-                break;
-            case 3:
-                setPoint = -100;
-                //LEDs.setColor("r");
-                break;
-            case 4:
-                setPoint = 100;
-                //LEDs.setColor("g");
-                break;
-        }
-        myPID.setReference(setPoint, CANSparkFlex.ControlType.kPosition);
+    public void PID (int pv/*int value*/) {
+        
+        //SmartDashboard.putNumber("Encoder Setpoint", 0);
+        if (pv == 1)
+            myPID.setReference(setpointPosition, CANSparkFlex.ControlType.kPosition);
+        if (pv == 2)
+            myPID.setReference(setpointVelocity, CANSparkFlex.ControlType.kVelocity);
         //robotContainer.getController().b().whileTrue(() -> 
         //myMotor2.restoreFactoryDefaults(),
         //myEncoder.setPosition(0));
@@ -105,8 +107,18 @@ public class MotorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Encoder", myEncoder.getPosition());
-        SmartDashboard.putNumber("Setpoint", setPoint);
+        // Position control
+        SmartDashboard.putNumber("Encoder Position", myEncoder.getPosition());
+        setpointPosition = Preferences.getDouble("Encoder Setpoint Position", setpointPosition);
+
+        // Velocity control
+        SmartDashboard.putNumber("Encoder Velocity", myEncoder.getVelocity());
+        setpointVelocity = Preferences.getDouble("Encoder Setpoint Velocity", setpointVelocity);
+
+        kP = Preferences.getDouble("kP Value", kP);
+        kD = Preferences.getDouble("kD Value", kD);
+        myPID.setP(kP); // Set kP
+        myPID.setD(kD); // Set kD
     }
 
     public RelativeEncoder getEncoder() {
