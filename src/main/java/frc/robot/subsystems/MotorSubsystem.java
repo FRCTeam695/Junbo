@@ -4,6 +4,8 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.PreSeasonSubsystem;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkFlexExternalEncoder;
@@ -44,10 +46,10 @@ public class MotorSubsystem extends SubsystemBase {
 
     private static double setpointPosition;
     private static double setpointVelocity;
-    private static double kP = 10;
-    private static double kD = 10;
+    private static double kP = 0;
+    private static double kD = 0;
+    private static double Kv = 0;
 
-    private static final double Kv = 565;
     private static final double kMaxOutput = 1;
     private static final double kMinOutput = -1;
 
@@ -72,18 +74,19 @@ public class MotorSubsystem extends SubsystemBase {
         myEncoder =  myMotor2.getEncoder();
 
         myMotor2.restoreFactoryDefaults();
-        myEncoder.setPosition(0);
+        //myEncoder.setPosition(0);
 
         myPID = myMotor2.getPIDController();
             myPID.setP(kP); // Set kP
             myPID.setD(kD); // Set kD
             myPID.setOutputRange(kMinOutput, kMaxOutput); // Set the minimum and maximum outputs of the motor [-1, 1]
-            myPID.setFF(0); // Set kFF
+            myPID.setFF(Kv); // Set kFF
         
         Preferences.initDouble("Encoder Setpoint Position", 0); // Setpoint Position
         Preferences.initDouble("Encoder Setpoint Velocity", 0); // Setpoint Velocity
-        Preferences.initDouble("kP Value", 10); // kP
-        Preferences.initDouble("kD Value", 10); // kD
+        Preferences.initDouble("kP Value", kP); // kP
+        Preferences.initDouble("kD Value", kD); // kD
+        Preferences.initDouble("kv Value", Kv); // kv
     }
 
     public void BasicDrivetrains () {
@@ -105,6 +108,16 @@ public class MotorSubsystem extends SubsystemBase {
         //myEncoder.setPosition(0));
     }
 
+    public Command someCommand(DoubleSupplier speed){
+        return 
+        runOnce(() -> myMotor2.restoreFactoryDefaults()).andThen(
+        run(
+            ()-> {
+                myPID.setReference(speed.getAsDouble() * 5700, CANSparkFlex.ControlType.kVelocity);
+            }
+        ));
+    }
+
     @Override
     public void periodic() {
         // Position control
@@ -117,8 +130,10 @@ public class MotorSubsystem extends SubsystemBase {
 
         kP = Preferences.getDouble("kP Value", kP);
         kD = Preferences.getDouble("kD Value", kD);
+        Kv = Preferences.getDouble("kv Value", Kv);
         myPID.setP(kP); // Set kP
         myPID.setD(kD); // Set kD
+        myPID.setFF(Kv);
     }
 
     public RelativeEncoder getEncoder() {

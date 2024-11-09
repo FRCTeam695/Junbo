@@ -89,6 +89,7 @@ public class RobotContainer {
     // Calculations
     //driveTrain.setDefaultCommand(runOnce(() -> ifButtonPressed(), driveTrain));
     m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(2), driveTrain));
+    m_driverController.leftBumper().whileTrue(driveTrain.someCommand(()-> m_driverController.getLeftX()));
   }
 
   /**
