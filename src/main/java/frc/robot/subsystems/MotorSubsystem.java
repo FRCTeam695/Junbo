@@ -108,17 +108,39 @@ public class MotorSubsystem extends SubsystemBase {
         //myEncoder.setPosition(0));
     }
 
-    public Command someCommand(DoubleSupplier speed){
+    public RelativeEncoder getEncoder() {
+        return myEncoder;
+    }
+
+    public Command betterPID(DoubleSupplier speed){
         return 
         runOnce(() -> myMotor2.restoreFactoryDefaults()).andThen(
         run(
             ()-> {
                 myPID.setReference(speed.getAsDouble() * 5700, CANSparkFlex.ControlType.kVelocity);
+                // Position control
+                SmartDashboard.putNumber("Encoder Position", myEncoder.getPosition());
+                setpointPosition = Preferences.getDouble("Encoder Setpoint Position", setpointPosition);
+
+                // Velocity control
+                SmartDashboard.putNumber("Encoder Velocity", myEncoder.getVelocity());
+                setpointVelocity = Preferences.getDouble("Encoder Setpoint Velocity", setpointVelocity);
+
+                kP = Preferences.getDouble("kP Value", kP);
+                kD = Preferences.getDouble("kD Value", kD);
+                Kv = Preferences.getDouble("kv Value", Kv);
+                myPID.setP(kP); // Set kP
+                myPID.setD(kD); // Set kD
+                myPID.setFF(Kv);
             }
         ));
     }
 
-    @Override
+    
+
+}
+
+/*@Override
     public void periodic() {
         // Position control
         SmartDashboard.putNumber("Encoder Position", myEncoder.getPosition());
@@ -135,8 +157,4 @@ public class MotorSubsystem extends SubsystemBase {
         myPID.setD(kD); // Set kD
         myPID.setFF(Kv);
     }
-
-    public RelativeEncoder getEncoder() {
-        return myEncoder;
-    }
-}
+*/

@@ -1,4 +1,6 @@
 package frc.robot.subsystems;
+import javax.swing.plaf.synth.Region;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,23 +33,32 @@ public class LEDSubsystem extends SubsystemBase{
         alphaLED.start();
     }
     public enum Colors {
-        RED,
-        YELLOW,
-        GREEN,
-        BLUE,
+        RED ("red", 255, 0, 0),
+        YELLOW ("yellow", 255, 255, 0),
+        GREEN ("green", 0, 255, 0),
+        CYAN ("cyan", 0, 255, 255),
+        BLUE ("blue", 0, 0, 255),
+        PINK ("pink", 255, 0, 255);
+
+        final String name;
+        final int red;
+        final int green;
+        final int blue;
+
+        Colors (String name, int red, int green, int blue) {
+            this.name = name;
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
+        }
     }
     
     public void setColor(String color) {
         alphaLED.setLength(alphaLEDBuffer.getLength());
-        switch (color) {
-            case "r":
-                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 255, 0, 0);
-            case "g":
-                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 0, 255, 0);
-            case "y":
-                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 255, 255, 0);
-            case "b":
-                for (int i = 0; i < 5; i++) alphaLEDBuffer.setRGB(i, 0, 0, 255);
+        for (Colors myColor : Colors.values()) {
+            if (myColor.name.equals(color))
+                for (int i = 0; i < 5; i++)
+                    alphaLEDBuffer.setRGB(i, myColor.red, myColor.green, myColor.blue);
         }
         alphaLED.setData(alphaLEDBuffer);
         alphaLED.start();

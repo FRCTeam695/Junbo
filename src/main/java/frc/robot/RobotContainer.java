@@ -7,6 +7,7 @@ package frc.robot;
 //import frc.robot.Constants.OperatorConstants;
 //import frc.robot.commands.Autos;
 import frc.robot.subsystems.MotorSubsystem;
+import frc.robot.subsystems.AdvancedPID;
 //import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.PreSeasonSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +39,7 @@ public class RobotContainer {
   //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final PreSeasonSubsystem mySubsystem = new PreSeasonSubsystem();
   private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem, 56); // mySubsystem = PreSeasonSubsystem
+  private final AdvancedPID elevator = new AdvancedPID();
 
   // Joysticks (Not controller)
   //public static CommandJoystick myLeftJoystick;
@@ -73,40 +75,47 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    //new Trigger(m_exampleSubsystem::exampleCondition)
-        //.onTrue(new ExampleCommand(m_exampleSubsystem));
-
-    // Schedule `exampleMethodCommand` when the Xbox controller's _ button is pressed,
-    // cancelling on release.
-
-    // Example control
-    // m_driverController.x().whileTrue(m_exampleSubsystem.servoCommand1());
-
-    // Motor movement
-    // mySubsystem.setDefaultCommand(runOnce(() -> mySubsystem.motorSet(m_driverController.getRightY()), mySubsystem));
-
-    // Calculations
-    //driveTrain.setDefaultCommand(runOnce(() -> ifButtonPressed(), driveTrain));
-    m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(2), driveTrain));
-    m_driverController.leftBumper().whileTrue(driveTrain.someCommand(()-> m_driverController.getLeftX()));
+    m_driverController.a().onTrue(elevator.talonSet(50));
+    m_driverController.b().onTrue(elevator.talonSet(100));
+    m_driverController.x().onTrue(elevator.talonSet(0));
+    m_driverController.y().onTrue(elevator.talonSet(150));
   }
-
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  //public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    //return driveTrain;
-  //}
 }
 
 // Terminal
 // git add .
 // git commit -m 'message'
 // git push
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+  //new Trigger(m_exampleSubsystem::exampleCondition)
+      //.onTrue(new ExampleCommand(m_exampleSubsystem));
+
+  // Schedule `exampleMethodCommand` when the Xbox controller's _ button is pressed,
+  // cancelling on release.
+
+  // Example control
+  // m_driverController.x().whileTrue(m_exampleSubsystem.servoCommand1());
+
+  // Motor movement
+  // mySubsystem.setDefaultCommand(runOnce(() -> mySubsystem.motorSet(m_driverController.getRightY()), mySubsystem));
+
+  // Calculations noob PID
+  //driveTrain.setDefaultCommand(runOnce(() -> ifButtonPressed(), driveTrain));
+  //m_driverController.x().onTrue(runOnce(() -> driveTrain.PID(2), driveTrain));
+  //m_driverController.leftBumper().whileTrue(driveTrain.betterPID(()-> m_driverController.getLeftX()));
+
+/**
+ * Use this to pass the autonomous command to the main {@link Robot} class.
+ *
+ * @return the command to run in autonomous
+ */
+//public Command getAutonomousCommand() {
+  // An example command will be run in autonomous
+  //return driveTrain;
+//}
 
 
 // Old code
