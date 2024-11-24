@@ -74,7 +74,6 @@ public class RobotContainer {
    */
   private void configureBindings() {
     SmartDashboard.putNumber("Initial Setpoint", elevator.getInitPosition());
-    // Setpoints are in rotations
     m_driverController.a().onTrue(elevator.talonSet(50));
     m_driverController.b().onTrue(elevator.talonSet(100));
     m_driverController.x().onTrue(elevator.talonSet(0));

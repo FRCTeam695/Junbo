@@ -76,6 +76,7 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
 
     @Override
     public void periodic() {
+        //System.out.println("idk");
         SmartDashboard.putNumber("Rotations", myTalon.getPosition().getValueAsDouble());
     }
 }
