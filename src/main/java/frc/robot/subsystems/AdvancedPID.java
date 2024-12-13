@@ -78,7 +78,7 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
         return runOnce(() -> 
         {
             TrapezoidProfile.State m_goal = new TrapezoidProfile.State(setpoint, 0);
-            TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
+            TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();;;
             m_setpoint = m_profile.calculate(3, m_setpoint, m_goal);
             m_request.Position = m_setpoint.position;
             m_request.Velocity = m_setpoint.velocity;
