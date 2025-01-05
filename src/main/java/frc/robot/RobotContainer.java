@@ -73,16 +73,14 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    int position = 30;
-    SmartDashboard.putNumber("Initial Setpoint", position);
-    /*m_driverController.a().onTrue(elevator.talonSet(50));
-    m_driverController.b().onTrue(elevator.talonSet(100));
-    m_driverController.x().onTrue(elevator.talonSet(0));
-    m_driverController.y().onTrue(elevator.talonSet(150));*/
-    m_driverController.leftBumper().whileTrue(elevator.talonSet(position));
-    m_driverController.rightBumper().whileTrue(elevator.talonSet(0));
+    m_driverController.a().onTrue(elevator.talonSet(30));
+    m_driverController.b().onTrue(elevator.talonSet(20));
+    m_driverController.x().onTrue(elevator.talonSet(10));
+    //m_driverController.y().onTrue(elevator.talonSet(34));
+    m_driverController.rightBumper().onTrue(elevator.talonSet(0));
   }
 }
+
 
 // Terminal
 // git add .

@@ -19,13 +19,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!!
     private TalonFX myTalon;
-    private PositionVoltage m_request;
+    private MotionMagicVoltage m_request;
     private TrapezoidProfile m_profile;
 
     public AdvancedPID() {
         myTalon = new TalonFX(50);
 
         var talonFXConfigs = new TalonFXConfiguration();
+        m_request = new MotionMagicVoltage(0);
 
         // Limits
         talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake; // Set neutral mode
@@ -34,55 +35,39 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
 
         talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-        talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 30; // Rotations
+        talonFXConfigs.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 35; // Rotations
         talonFXConfigs.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
         
-        // PDSAV Settings
+        // Tuning
         // Mainly for overshoot + undershoot tuning
-        var slot0Configs = new Slot0Configs();
-        // 0.5V is neede
-        slot0Configs.kG = 0.20; // Gravity 0.2
+        var slot0Configs = talonFXConfigs.Slot0;
+        // 0.5V is needed for gravity/friction
+        slot0Configs.kG = 0.37; // Gravity 0.37 volt
         slot0Configs.GravityType = GravityTypeValue.Elevator_Static;
-        slot0Configs.kS = 0.30; // Friction 0.3
+        slot0Configs.kS = 0.13; // Friction 0.13 volt
         slot0Configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
-        slot0Configs.kV = 1; // Velocity
-        slot0Configs.kA = 0; // Acceleration
-        slot0Configs.kP = 0; // Proportion
-        slot0Configs.kD = 0; // Derivative
+        slot0Configs.kV = 0.1; // volt/rps
+        slot0Configs.kA = 0.01; // volt/rps/s
+        slot0Configs.kP = 3.5; // volt/(r*s)
+        slot0Configs.kD = 0.1; // volt/rps
 
-        m_profile= new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(15, 30));
         // Motion Magic (Trapezoid speed control)
-        //var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        //talonFXConfigs.MotionMagic.MotionMagicCruiseVelocity = 10; // 10 rot/sec
-        //talonFXConfigs.MotionMagic.MotionMagicAcceleration = 20; // 0.5 sec to reach cruise v
-        //motionMagicConfigs.MotionMagicJerk = 0;
+        var motionMagicConfigs = talonFXConfigs.MotionMagic;
+        motionMagicConfigs.MotionMagicCruiseVelocity = 60; 
+        motionMagicConfigs.MotionMagicAcceleration = 200; 
+        motionMagicConfigs.MotionMagicJerk = 2000;
 
-        var motorConfigs = new MotorOutputConfigs();
-
-        // set invert to CW+ and apply config change
-        motorConfigs.Inverted = InvertedValue.Clockwise_Positive;
-        myTalon.getConfigurator().apply(motorConfigs);
         myTalon.getConfigurator().apply(talonFXConfigs);
-        myTalon.getConfigurator().apply(slot0Configs);
-        //myTalon.getConfigurator().apply(motionMagicConfigs);
 
-        myTalon.setPosition(0);
-
-        m_request= new PositionVoltage(0).withSlot(0);
+        myTalon.setPosition(0);  
     }
 
     // Setting elevator talon to spin to a certain height
-    // a, b, x, y control different set heights
+    // a, b, x, and right bumper control different set heights
     public Command talonSet(double setpoint) {
         return runOnce(() -> 
         {
-            TrapezoidProfile.State m_goal = new TrapezoidProfile.State(setpoint, 0);
-            TrapezoidProfile.State m_setpoint = new TrapezoidProfile.State();
-            m_setpoint = m_profile.calculate(3, m_setpoint, m_goal);
-            m_request.Position = m_setpoint.position;
-            m_request.Velocity = m_setpoint.velocity;
-            myTalon.setControl(m_request);
+            myTalon.setControl(m_request.withPosition(setpoint));
         });
     }
 
