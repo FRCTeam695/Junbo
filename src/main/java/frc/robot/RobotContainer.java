@@ -10,11 +10,16 @@ package frc.robot;
 //import frc.robot.subsystems.ExampleSubsystem;
 //import frc.robot.subsystems.PreSeasonSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import static edu.wpi.first.wpilibj2.command.Commands.*;
+
+import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -73,11 +78,18 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    m_driverController.a().onTrue(elevator.talonSet(30));
+    /*m_driverController.a().onTrue(elevator.talonSet(30));
     m_driverController.b().onTrue(elevator.talonSet(20));
     m_driverController.x().onTrue(elevator.talonSet(10));
     //m_driverController.y().onTrue(elevator.talonSet(34));
-    m_driverController.rightBumper().onTrue(elevator.talonSet(0));
+    m_driverController.rightBumper().onTrue(elevator.talonSet(0));*/
+    m_driverController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+    m_driverController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
+
+    m_driverController.x().whileTrue(elevator.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    m_driverController.y().whileTrue(elevator.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    m_driverController.a().whileTrue(elevator.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    m_driverController.b().whileTrue(elevator.sysIdDynamic(SysIdRoutine.Direction.kReverse));
   }
 }
 
@@ -85,7 +97,7 @@ public class RobotContainer {
 // Terminal
 // git add .
 // git commit -m 'message'
-// git push
+// git push origin HEAD:main2
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
