@@ -15,11 +15,15 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.PubSubOption;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.units.*;
 import edu.wpi.first.units.measure.*;
 import static edu.wpi.first.units.Units.Volts; // Static so that everything is there (No need to write Units.)
 
@@ -27,6 +31,16 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
     private TalonFX myTalon;
     private MotionMagicVoltage m_request;
     private VoltageOut m_voltReq;
+
+    private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    private final NetworkTable elevatorTable = inst.getTable("Elevator");
+    private final DoublePublisher motorRotPub = elevatorTable.getDoubleTopic("Motor rotations").publish(PubSubOption.periodic(0.02));
+    private final DoublePublisher closedLoopPub = elevatorTable.getDoubleTopic("Closed Loop Output").publish(PubSubOption.periodic(0.02));
+    private final DoublePublisher FFPub = elevatorTable.getDoubleTopic("Feed Forward").publish(PubSubOption.periodic(0.02));
+    private final DoublePublisher velocityPub = elevatorTable.getDoubleTopic("Velocity").publish(PubSubOption.periodic(0.02));
+    private final DoublePublisher velocityTargetPub = elevatorTable.getDoubleTopic("Velocity Target").publish(PubSubOption.periodic(0.02));
+    private final DoublePublisher rotationsTargetPub = elevatorTable.getDoubleTopic("Position Target").publish(PubSubOption.periodic(0.02));
+
 
     public AdvancedPID() {
         myTalon = new TalonFX(50);
@@ -50,19 +64,19 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
         // Mainly for overshoot + undershoot tuning
         var slot0Configs = talonFXConfigs.Slot0;
         // 0.5V is needed for gravity/friction
-        slot0Configs.kG = 0.37; // Gravity 0.37 volt
+        slot0Configs.kG = 0.36; // Gravity 0.37 volt
         slot0Configs.GravityType = GravityTypeValue.Elevator_Static;
-        slot0Configs.kS = 0.13; // Friction 0.13 volt
+        slot0Configs.kS = 0.08; // Friction 0.13 volt
         slot0Configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
-        slot0Configs.kV = 0.1; // volt/rps
-        slot0Configs.kA = 0.01; // volt/rps/s
-        slot0Configs.kP = 3.5; // volt/(r*s)
-        slot0Configs.kD = 0.1; // volt/rps
+        slot0Configs.kV = 0.12; // volt/rps
+        slot0Configs.kA = 0; // volt/rps/s //0.01
+        slot0Configs.kP = 3.5; // volt/(r*s) //3.5
+        slot0Configs.kD = 0.0; // volt/rps //0.1
 
         // Motion Magic (Trapezoid speed control)
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
         motionMagicConfigs.MotionMagicCruiseVelocity = 60; 
-        motionMagicConfigs.MotionMagicAcceleration = 200; 
+        motionMagicConfigs.MotionMagicAcceleration = 150; 
         motionMagicConfigs.MotionMagicJerk = 2000;
 
         myTalon.getConfigurator().apply(talonFXConfigs);
@@ -105,10 +119,17 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Motor Rotations", myTalon.getPosition(true).getValueAsDouble());
+        SmartDashboard.putNumber("Motor Rotations", myTalon.getPosition().getValueAsDouble());
         SmartDashboard.putNumber("Closed Loop Output", myTalon.getClosedLoopOutput().getValueAsDouble());
         SmartDashboard.putNumber("FF Output", myTalon.getClosedLoopFeedForward().getValueAsDouble());
-        SmartDashboard.putNumber("Velocity", myTalon.getClosedLoopFeedForward().getValueAsDouble());
+        SmartDashboard.putNumber("Velocity", myTalon.getVelocity().getValueAsDouble());
+        
+        motorRotPub.set(myTalon.getPosition(true).getValueAsDouble());
+        closedLoopPub.set(myTalon.getClosedLoopProportionalOutput(true).getValueAsDouble());
+        FFPub.set(myTalon.getClosedLoopFeedForward(true).getValueAsDouble());
+        velocityPub.set(myTalon.getVelocity(true).getValueAsDouble());
+        velocityTargetPub.set(myTalon.getClosedLoopReferenceSlope(true).getValueAsDouble());
+        rotationsTargetPub.set(myTalon.getClosedLoopReference(true).getValueAsDouble());
         
     }
 }

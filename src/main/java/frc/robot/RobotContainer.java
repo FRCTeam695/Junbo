@@ -78,18 +78,22 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    /*m_driverController.a().onTrue(elevator.talonSet(30));
+    m_driverController.a().onTrue(elevator.talonSet(30));
     m_driverController.b().onTrue(elevator.talonSet(20));
     m_driverController.x().onTrue(elevator.talonSet(10));
     //m_driverController.y().onTrue(elevator.talonSet(34));
-    m_driverController.rightBumper().onTrue(elevator.talonSet(0));*/
-    m_driverController.leftBumper().onTrue(Commands.runOnce(SignalLogger::start));
+    m_driverController.rightBumper().onTrue(elevator.talonSet(0));
+    /*m_driverController.leftBumper().onTrue(Commands.runOnce(()->{
+      //SignalLogger.setPath("/media/sda1/ctre-logs/");
+      SignalLogger.start();
+      
+    }));
     m_driverController.rightBumper().onTrue(Commands.runOnce(SignalLogger::stop));
 
     m_driverController.x().whileTrue(elevator.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
     m_driverController.y().whileTrue(elevator.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
     m_driverController.a().whileTrue(elevator.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    m_driverController.b().whileTrue(elevator.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    m_driverController.b().whileTrue(elevator.sysIdDynamic(SysIdRoutine.Direction.kReverse));*/
   }
 }
 
