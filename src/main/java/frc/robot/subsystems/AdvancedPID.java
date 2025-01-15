@@ -64,18 +64,18 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
         // Mainly for overshoot + undershoot tuning
         var slot0Configs = talonFXConfigs.Slot0;
         // 0.5V is needed for gravity/friction
-        slot0Configs.kG = 0.36; // Gravity 0.37 volt
+        slot0Configs.kG = 0.37; // Gravity 0.37 volt
         slot0Configs.GravityType = GravityTypeValue.Elevator_Static;
-        slot0Configs.kS = 0.08; // Friction 0.13 volt
+        slot0Configs.kS = 0.07; // Friction 0.07 volt
         slot0Configs.StaticFeedforwardSign = StaticFeedforwardSignValue.UseClosedLoopSign;
-        slot0Configs.kV = 0.12; // volt/rps
-        slot0Configs.kA = 0; // volt/rps/s //0.01
+        slot0Configs.kV = 0.13; // volt/rps
+        slot0Configs.kA = 0.008; // volt/rps/s //0.008
         slot0Configs.kP = 3.5; // volt/(r*s) //3.5
-        slot0Configs.kD = 0.0; // volt/rps //0.1
+        slot0Configs.kD = 0.1; // volt/rps //0.1
 
         // Motion Magic (Trapezoid speed control)
         var motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = 60; 
+        motionMagicConfigs.MotionMagicCruiseVelocity = 100; 
         motionMagicConfigs.MotionMagicAcceleration = 150; 
         motionMagicConfigs.MotionMagicJerk = 2000;
 
