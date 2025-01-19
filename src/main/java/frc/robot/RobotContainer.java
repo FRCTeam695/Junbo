@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
-import frc.robot.subsystems.AdvancedPID;
+import frc.robot.subsystems.TalonElevator;
 //import edu.wpi.first.wpilibj.PWM;
 //import edu.wpi.first.wpilibj.Servo;
 
@@ -44,7 +44,7 @@ public class RobotContainer {
   //private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   //private final PreSeasonSubsystem mySubsystem = new PreSeasonSubsystem();
   //private final MotorSubsystem driveTrain = new MotorSubsystem(mySubsystem, 56); // mySubsystem = PreSeasonSubsystem
-  private final AdvancedPID elevator = new AdvancedPID();
+  private final TalonElevator elevator = new TalonElevator();
 
   // Joysticks (Not controller) - Deprecated
   //public static CommandJoystick myLeftJoystick;

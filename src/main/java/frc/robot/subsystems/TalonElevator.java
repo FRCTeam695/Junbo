@@ -27,13 +27,15 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.units.measure.*;
 import static edu.wpi.first.units.Units.Volts; // Static so that everything is there (No need to write Units.)
 
-public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!!
+public class TalonElevator extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!!
     private TalonFX myTalon;
     private MotionMagicVoltage m_request;
     private VoltageOut m_voltReq;
 
+    // 50Hz NetworkTable variables
     private final NetworkTableInstance inst = NetworkTableInstance.getDefault();
     private final NetworkTable elevatorTable = inst.getTable("Elevator");
+
     private final DoublePublisher motorRotPub = elevatorTable.getDoubleTopic("Motor rotations").publish(PubSubOption.periodic(0.02));
     private final DoublePublisher closedLoopPub = elevatorTable.getDoubleTopic("Closed Loop Output").publish(PubSubOption.periodic(0.02));
     private final DoublePublisher FFPub = elevatorTable.getDoubleTopic("Feed Forward").publish(PubSubOption.periodic(0.02));
@@ -41,12 +43,12 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
     private final DoublePublisher velocityTargetPub = elevatorTable.getDoubleTopic("Velocity Target").publish(PubSubOption.periodic(0.02));
     private final DoublePublisher rotationsTargetPub = elevatorTable.getDoubleTopic("Position Target").publish(PubSubOption.periodic(0.02));
 
+    // Constructor
+    public TalonElevator() {
+        myTalon = new TalonFX(50); // Falcon 500
 
-    public AdvancedPID() {
-        myTalon = new TalonFX(50);
-
-        var talonFXConfigs = new TalonFXConfiguration();
-        m_request = new MotionMagicVoltage(0);
+        var talonFXConfigs = new TalonFXConfiguration(); // All paramater configs
+        m_request = new MotionMagicVoltage(0); // Trapezoid config
 
         m_voltReq = new VoltageOut(0);
 
@@ -93,30 +95,6 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
         });
     }
 
-    // SysID
-    private SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-        new SysIdRoutine.Config(
-            null, // Default ramp rate (1V/s)
-            Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
-            null, // Default timeout (10s)
-
-            (state) -> SignalLogger.writeString("State", state.toString())
-        ), 
-        new SysIdRoutine.Mechanism(
-            (volts) -> myTalon.setControl(m_voltReq.withOutput(volts.in(Volts))),
-            null, // Left null when using a signal logger
-            this
-        )
-    );
-
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.quasistatic(direction);
-    }
-     
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.dynamic(direction);
-    }
-
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Motor Rotations", myTalon.getPosition().getValueAsDouble());
@@ -130,7 +108,29 @@ public class AdvancedPID extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!!!
         velocityPub.set(myTalon.getVelocity(true).getValueAsDouble());
         velocityTargetPub.set(myTalon.getClosedLoopReferenceSlope(true).getValueAsDouble());
         rotationsTargetPub.set(myTalon.getClosedLoopReference(true).getValueAsDouble());
-        
     }
 }
-// Motion magic sysID
+
+// SysID
+/*private SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
+    new SysIdRoutine.Config(
+        null, // Default ramp rate (1V/s)
+        Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
+        null, // Default timeout (10s)
+
+        (state) -> SignalLogger.writeString("State", state.toString())
+    ), 
+    new SysIdRoutine.Mechanism(
+        (volts) -> myTalon.setControl(m_voltReq.withOutput(volts.in(Volts))),
+        null, // Left null when using a signal logger
+        this
+    )
+);
+
+public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.quasistatic(direction);
+}
+ 
+public Command sysIdDynamic(SysIdRoutine.Direction direction) {
+    return m_sysIdRoutine.dynamic(direction);
+}*/
