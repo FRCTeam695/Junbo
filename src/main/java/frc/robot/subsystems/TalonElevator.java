@@ -49,7 +49,8 @@ public class TalonElevator extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!
 
         var talonFXConfigs = new TalonFXConfiguration(); // All paramater configs
         m_request = new MotionMagicVoltage(0); // Trapezoid config
-
+        
+        var supplyVoltageSignal = myTalon.getSupplyVoltage(); // Motor signaling rate
         m_voltReq = new VoltageOut(0);
 
         // Limits
@@ -83,6 +84,7 @@ public class TalonElevator extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!
 
         myTalon.getConfigurator().apply(talonFXConfigs);
 
+        supplyVoltageSignal.setUpdateFrequency(50); // 50Hz frequency
         myTalon.setPosition(0);  
     }
 
@@ -110,27 +112,3 @@ public class TalonElevator extends SubsystemBase{ // EXTENDS SUBSYSTEMBASE!!!!!!
         rotationsTargetPub.set(myTalon.getClosedLoopReference(true).getValueAsDouble());
     }
 }
-
-// SysID
-/*private SysIdRoutine m_sysIdRoutine = new SysIdRoutine(
-    new SysIdRoutine.Config(
-        null, // Default ramp rate (1V/s)
-        Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
-        null, // Default timeout (10s)
-
-        (state) -> SignalLogger.writeString("State", state.toString())
-    ), 
-    new SysIdRoutine.Mechanism(
-        (volts) -> myTalon.setControl(m_voltReq.withOutput(volts.in(Volts))),
-        null, // Left null when using a signal logger
-        this
-    )
-);
-
-public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.quasistatic(direction);
-}
- 
-public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return m_sysIdRoutine.dynamic(direction);
-}*/
